@@ -3,9 +3,11 @@ import control.account.variables as variables
 
 account = tinvest.SyncClient(variables.token)
 
+
 class Portfolio:
     """ клас Портфолио, пока по умолчанию используется обычный брокер счет (variables.broker_account_id)
     """
+
     def __init__(self):
         self.broker_account_id = variables.broker_account_id
         self.portfolio = account.get_portfolio(self.broker_account_id)

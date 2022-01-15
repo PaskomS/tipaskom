@@ -1,5 +1,12 @@
-import control.main_control as main_control
+import figi as figi
 
+Figi = figi.Figi('BBG004S68758')
+d = Figi.verify_stock_in_portfolio_exist()
+name_figi = Figi.stock.payload.name
+
+Figi.update_hystory()
+
+s = 1
 #
 #11
 # exit()
