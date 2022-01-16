@@ -1,6 +1,6 @@
 import sqlalchemy.schema
 from sqlalchemy import create_engine, MetaData, Table, Integer, String, \
-    Column, DateTime, ForeignKey, Numeric, schema, Float
+    Column, DateTime, ForeignKey, Numeric, schema, Float, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import Session, sessionmaker
@@ -21,21 +21,37 @@ ses = session()
 """
 
 
+def get_last_date(Figi, acc):
+    table_name = Figi.figi
+    table = create_table(table_name)
+    aaa = ses.query(table).all()
+    ...
+
+
 def update(Figi, acc):
+    #get_last_date(Figi, acc)
     # задается имя таблицы, вызывается алгоритм получения исторической информации по котировкам
-    aaa = Figi
     table_name = Figi.figi
     table = create_table(table_name)
     fff = get_candles(Figi.figi, acc)
-    bbb = fff.payload.candles[000].time.replace(tzinfo=None)
-    table.datetime = fff.payload.candles[000].time.replace(tzinfo=None)
-    table.cl = fff.payload.candles[000].c
-    table.hi = fff.payload.candles[000].h
-    table.lo = fff.payload.candles[000].l
-    table.op = fff.payload.candles[000].o
-    table.vol = fff.payload.candles[000].v
-    ses.add(table)
-    ses.commit()
+    for bbb in range(7):
+        table.datetime = fff.payload.candles[bbb].time.replace(tzinfo=None)
+        table.cl = fff.payload.candles[bbb].c
+        table.hi = fff.payload.candles[bbb].h
+        table.lo = fff.payload.candles[bbb].l
+        table.op = fff.payload.candles[bbb].o
+        table.vol = fff.payload.candles[bbb].v
+        try:
+            ses.add(table)
+            ses.commit()
+        #Дата уникальная, при попытке записать уже имеющуюся дату транзакцию пропускать
+        except Exception as exception:
+            if exception.__class__.__name__ == 'IntegrityError':
+                ses.rollback()
+        else:
+            ses.commit()
+        ...
+    aaa = ses.query(table).all()
     ...
 
 def get_candles(figi, acc):
@@ -61,7 +77,7 @@ def create_table(tbl_name):
     class Post(Base):
         __tablename__ = tbl_name
         id = Column(Integer, primary_key=True)
-        datetime = Column(DateTime)
+        datetime = Column(DateTime, unique=True)
         cl = Column(Float)
         hi = Column(Float)
         lo = Column(Float)
@@ -69,7 +85,7 @@ def create_table(tbl_name):
         vol = Column(Integer)
 
     Base.metadata.create_all(engine)
-    return Post
+    return Post()
 
 
 a = 1
