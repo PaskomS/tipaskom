@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import Session, sessionmaker
 
-engine = create_engine('sqlite:///sqlite.db')  # используя относительный путь
+engine = create_engine('sqlite:///control/db/hystory_candles.db')  # используя относительный путь
 # engine = create_engine('sqlite:////path/to/sqlite3.db')  # абсолютный путь
 
 session = sessionmaker(bind=engine)
@@ -21,21 +21,20 @@ class Post(Base):
 
 
 Base.metadata.create_all(engine)
+c0 = Post()
+c0.lLo = 2
+Post.lLo = 2
+
 c1 = Post(
-    hHi='2',
-    lLo='3'
+    hHi='44',
+    lLo='55'
+    )
+ses.add(c1)
+c1 = Post(
+    hHi='66',
+    lLo='77'
     )
 ses.add(c1)
 ses.commit()
+...
 
-a = 1
-
-class Asd:
-    def __init__(self):
-        a = 1
-        b = 2
-        c = a+b
-
-
-
-aaaaa = Asd

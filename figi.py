@@ -1,4 +1,5 @@
-import control.account.cur_account as acc
+import control.account.cur_account as cur_account
+import control.db.hystory_candles as hystory_candles
 
 
 class Figi:
@@ -8,12 +9,13 @@ class Figi:
         проверка есть ли данная акция в портфеле
     """
 
-    def __init__(self, figi):
+    def __init__(self, figi:str):
         self.figi = figi
-        #self.account = account
+        self.cur_account = cur_account
         try:
-            self.stock = acc.account.get_market_search_by_figi(self.figi)
+            self.stock = cur_account.account.get_market_search_by_figi(self.figi)
             self.figi_found = True
+            self.table = hystory_candles.create_table(self.figi)
         except Exception:
             self.figi_found = False
 
@@ -26,7 +28,7 @@ class Figi:
         """
             проверка есть ли данная акция в портфеле
         """
-        for stock in acc.portfolio.stocks:
+        for stock in cur_account.portfolio.stocks:
             if self.figi == stock.figi:
                 return True
             else:
@@ -42,8 +44,7 @@ class Figi:
             4 отправить котировки на запись в бд
         """
 
-        import control.hystory.update_hystory
-        control.hystory.update_hystory.update(self, acc)
+        hystory_candles.update(self)
 
         #candl = account.get_market_candles(self.figi, "2019-08-01T00:00:00+00:00", "2019-09-01T00:00:00+00:00", acc.tinvest.CandleResolution.day)
         #candl = acc.account.get_market_candles(self.figi, "2022-01-06T00:00:00+00:00", "2022-01-06T23:00:00+00:00",
